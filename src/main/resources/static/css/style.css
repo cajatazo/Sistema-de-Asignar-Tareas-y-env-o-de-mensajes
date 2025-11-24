@@ -1,0 +1,100 @@
+/* Custom Styles */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* Dashboard stats */
+.stats-card {
+    transition: transform 0.2s;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Task status badges */
+.badge-task-pending {
+    background-color: var(--warning-color);
+    color: #000;
+}
+
+.badge-task-in-progress {
+    background-color: var(--info-color);
+    color: #fff;
+}
+
+.badge-task-completed {
+    background-color: var(--success-color);
+    color: #fff;
+}
+
+/* Message styles */
+.message-unread {
+    background-color: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+}
+
+.message-read {
+    background-color: #fff;
+}
+
+/* Notification styles */
+.notification-unread {
+    background-color: #e3f2fd;
+    border-left: 4px solid var(--info-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    border: 0.25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+    to { transform: rotate(360deg); }
+}

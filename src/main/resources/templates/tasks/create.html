@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Tarea - Sistema de Tareas</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-plus me-2"></i>Crear Nueva Tarea
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/tasks/create}" th:object="${task}" method="post">
+                            <input type="hidden" name="courseId" th:value="${courseId}">
+                            
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Título de la Tarea</label>
+                                <input type="text" class="form-control" id="title" th:field="*{title}" 
+                                       placeholder="Ej: Ejercicios de Matemáticas" required>
+                                <div th:if="${#fields.hasErrors('title')}" class="text-danger small">
+                                    <span th:errors="*{title}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="description" th:field="*{description}" 
+                                          rows="5" placeholder="Describe los detalles de la tarea..."></textarea>
+                                <div class="form-text">Máximo 1000 caracteres</div>
+                                <div th:if="${#fields.hasErrors('description')}" class="text-danger small">
+                                    <span th:errors="*{description}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dueDate" class="form-label">Fecha de Vencimiento</label>
+                                        <input type="datetime-local" class="form-control" id="dueDate" 
+                                               th:field="*{dueDate}" th:min="${minDate}" required>
+                                        <div th:if="${#fields.hasErrors('dueDate')}" class="text-danger small">
+                                            <span th:errors="*{dueDate}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="points" class="form-label">Puntos</label>
+                                        <input type="number" class="form-control" id="points" th:field="*{points}" 
+                                               min="1" max="100" value="10" required>
+                                        <div th:if="${#fields.hasErrors('points')}" class="text-danger small">
+                                            <span th:errors="*{points}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="course" class="form-label">Curso</label>
+                                <select class="form-select" id="course" name="courseId" required>
+                                    <option th:if="${courseId == null}" value="">Selecciona un curso</option>
+                                    <option th:each="course : ${courses}" 
+                                            th:value="${course.id}"
+                                            th:text="${course.name}"
+                                            th:selected="${courseId != null && courseId == course.id}">
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="alert alert-warning">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Importante
+                                </h6>
+                                <p class="mb-0">
+                                    Una vez creada la tarea, todos los estudiantes del curso recibirán una notificación.
+                                    La fecha de vencimiento no puede ser anterior a la fecha actual.
+                                </p>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/tasks}" class="btn btn-secondary me-md-2">
+                                    <i class="fas fa-times me-1"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Crear Tarea
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

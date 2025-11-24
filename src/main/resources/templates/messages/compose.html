@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Mensaje - Sistema de Tareas</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-envelope me-2"></i>Nuevo Mensaje
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/messages/send}" method="post">
+                            <div class="mb-3">
+                                <label for="receiverId" class="form-label">Para</label>
+                                <select class="form-select" id="receiverId" name="receiverId" required>
+                                    <option value="">Selecciona un destinatario</option>
+                                    <option th:each="user : ${users}" 
+                                            th:value="${user.id}"
+                                            th:text="${user.fullName + ' (' + user.role + ')'}"
+                                            th:selected="${recipientId != null && recipientId == user.id}">
+                                    </option>
+                                </select>
+                                <div class="form-text">Selecciona el usuario al que deseas enviar el mensaje</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Asunto</label>
+                                <input type="text" class="form-control" id="subject" name="subject" 
+                                       placeholder="Asunto del mensaje" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Mensaje</label>
+                                <textarea class="form-control" id="content" name="content" 
+                                          rows="8" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                                <div class="form-text">Máximo 2000 caracteres</div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-info-circle me-2"></i>Información
+                                </h6>
+                                <p class="mb-0">
+                                    El destinatario recibirá una notificación cuando envíes este mensaje.
+                                    Puedes enviar mensajes a cualquier usuario del sistema.
+                                </p>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/messages}" class="btn btn-secondary me-md-2">
+                                    <i class="fas fa-times me-1"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-1"></i>Enviar Mensaje
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

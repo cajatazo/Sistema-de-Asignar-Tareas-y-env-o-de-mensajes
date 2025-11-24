@@ -1,0 +1,114 @@
+Perfecto 👍, vamos paso a paso con **la solución desde Windows usando EasyUEFI**, ya que tu Kali no arranca.
+
+---
+
+## 🧭 OBJETIVO
+
+Recrear la entrada del arranque EFI de **Kali Linux** desde Windows, para que GRUB aparezca al encender y te deje elegir entre **Kali** y **Windows**.
+
+---
+
+## 🪟 PASO A PASO EN WINDOWS CON EASYUEFI
+
+### 🔹 **1️⃣ Descargar e instalar EasyUEFI**
+
+1. Entra a la web oficial:
+   👉 [https://www.easyuefi.com/](https://www.easyuefi.com/)
+2. Descarga la **versión Free (gratuita)**.
+3. Instálala normalmente en Windows.
+
+---
+
+### 🔹 **2️⃣ Abrir EasyUEFI**
+
+* Ejecútalo como **Administrador** (clic derecho → *Ejecutar como administrador*).
+* Se abrirá una ventana con varias pestañas.
+  La que nos interesa es **“Manage EFI Boot Entries”**.
+
+---
+
+### 🔹 **3️⃣ Ver las entradas existentes**
+
+* En la lista verás algo como:
+
+  ```
+  Windows Boot Manager
+  UEFI: <nombre de tu disco>
+  ...
+  ```
+* Si ves una entrada llamada **Kali**, **Debian** o **grub**, selecciónala y pulsa el botón de **subir flecha arriba** (↑) para ponerla antes de “Windows Boot Manager”.
+
+👉 **Después reinicia**.
+Si te aparece el menú GRUB, ¡listo, ya está! 🎉
+
+---
+
+### 🔹 **4️⃣ Si no aparece ninguna entrada de Kali/Debian**
+
+Entonces tenemos que **crear una nueva manualmente**.
+
+Haz esto:
+
+1. En la parte derecha, haz clic en **Add New Entry**.
+2. En el cuadro que aparece:
+
+   * **Type:** `Linux or Other OS`
+   * **Description:** `Kali Linux`
+3. Ahora haz clic en **Browse** o **Seleccionar archivo de arranque**.
+
+---
+
+### 🔹 **5️⃣ Buscar el archivo de GRUB en la partición EFI**
+
+Te saldrá un explorador de archivos.
+
+1. Selecciona la partición **EFI** (suele tener unos 100 MB y está en formato FAT32).
+2. Navega dentro de ella hasta encontrar una de estas rutas:
+
+   ```
+   \EFI\kali\grubx64.efi
+   ```
+
+   o si no existe:
+
+   ```
+   \EFI\debian\grubx64.efi
+   ```
+
+📌 Si ves la carpeta **Kali** o **Debian**, entra y selecciona el archivo `grubx64.efi`.
+
+3. Pulsa **Aceptar**.
+
+---
+
+### 🔹 **6️⃣ Guardar los cambios**
+
+* Dale clic a **OK** o **Guardar**.
+* Luego asegúrate de que la nueva entrada “Kali Linux” esté **arriba de Windows Boot Manager** en la lista (usa las flechas ↑ y ↓).
+
+---
+
+### 🔹 **7️⃣ Reiniciar**
+
+Reinicia tu PC.
+✅ Debería aparecer el **menú de GRUB** con las opciones:
+
+* **Kali GNU/Linux**
+* **Windows Boot Manager**
+
+---
+
+### 💡 Si GRUB aparece pero Windows no:
+
+Inicia Kali, abre una terminal y ejecuta:
+
+```bash
+sudo update-grub
+```
+
+Esto hará que se detecte Windows y se agregue al menú.
+
+---
+
+¿Quieres que te guíe con imágenes (para que veas exactamente cómo navegar hasta `EFI\kali\grubx64.efi` dentro de EasyUEFI)?
+Puedo generar una ilustración del proceso paso a paso.

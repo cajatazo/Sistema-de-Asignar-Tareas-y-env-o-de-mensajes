@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Tareas</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container mt-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <img th:src="@{/images/avatar.png}" class="rounded-circle mb-3" width="100" height="100">
+                        <h5 th:text="${currentUser.fullName}"></h5>
+                        <span class="badge bg-success" th:text="${currentUser.role}"></span>
+                        <p class="text-muted mt-2" th:text="${currentUser.email}"></p>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="card-title">Acciones Rápidas</h6>
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/courses/join}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>Unirse a Curso
+                            </a>
+                            <a th:href="@{/tasks}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-tasks me-1"></i>Ver Tareas
+                            </a>
+                            <a th:href="@{/messages/compose}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-envelope me-1"></i>Nuevo Mensaje
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <div class="row">
+                    <!-- Stats Cards -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 th:text="${courses.size()}">0</h4>
+                                        <p class="mb-0">Cursos Inscritos</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-book fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 th:text="${upcomingTasks.size()}">0</h4>
+                                        <p class="mb-0">Tareas Pendientes</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-tasks fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 th:text="${unreadMessageCount}">0</h4>
+                                        <p class="mb-0">Mensajes No Leídos</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-envelope fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Tasks -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Próximas Tareas</h5>
+                        <a th:href="@{/tasks}" class="btn btn-sm btn-outline-primary">Ver Todas</a>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${upcomingTasks.empty}" class="text-center text-muted py-4">
+                            <i class="fas fa-check-circle fa-3x mb-3"></i>
+                            <p>No tienes tareas pendientes</p>
+                        </div>
+                        
+                        <div th:each="task : ${upcomingTasks}" class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 th:text="${task.title}"></h6>
+                                    <p class="text-muted mb-1" th:text="${task.description}"></p>
+                                    <small class="text-muted">
+                                        Curso: <span th:text="${task.course.name}"></span> | 
+                                        Vence: <span th:text="${#temporals.format(task.dueDate, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </small>
+                                </div>
+                                <span class="badge bg-primary" th:text="${task.points + ' pts'}"></span>
+                            </div>
+                            <div class="mt-2">
+                                <a th:href="@{/tasks/{id}(id=${task.id})}" class="btn btn-sm btn-outline-primary">
+                                    Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Courses -->
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Mis Cursos</h5>
+                        <a th:href="@{/courses}" class="btn btn-sm btn-outline-primary">Ver Todos</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div th:each="course : ${courses}" class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 th:text="${course.name}"></h6>
+                                        <p class="text-muted small" th:text="${course.description}"></p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                Profesor: <span th:text="${course.teacher.fullName}"></span>
+                                            </small>
+                                            <a th:href="@{/courses/{id}(id=${course.id})}" 
+                                               class="btn btn-sm btn-outline-primary">Entrar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

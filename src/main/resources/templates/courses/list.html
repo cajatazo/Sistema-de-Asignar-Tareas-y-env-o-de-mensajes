@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursos - Sistema de Tareas</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Mis Cursos</h1>
+            <div>
+                <th:block th:if="${currentUser.role.name() == 'TEACHER'}">
+                    <a th:href="@{/courses/create}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Nuevo Curso
+                    </a>
+                </th:block>
+                <th:block th:if="${currentUser.role.name() == 'STUDENT'}">
+                    <a th:href="@{/courses/join}" class="btn btn-success">
+                        <i class="fas fa-sign-in-alt me-1"></i>Unirse a Curso
+                    </a>
+                </th:block>
+            </div>
+        </div>
+
+        <div class="row">
+            <div th:each="course : ${courses}" class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${course.name}"></h5>
+                        <p class="card-text text-muted" th:text="${course.description}"></p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <strong>Código:</strong> <span th:text="${course.code}"></span>
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <strong>Profesor:</strong> <span th:text="${course.teacher.fullName}"></span>
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <span class="badge bg-info" th:text="${course.students.size() + ' estudiantes'}"></span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a th:href="@{/courses/{id}(id=${course.id})}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>Ver Curso
+                        </a>
+                        <th:block th:if="${currentUser.role.name() == 'TEACHER'}">
+                            <a th:href="@{/tasks/create?courseId={id}(id=${course.id})}" 
+                               class="btn btn-outline-success btn-sm ms-1">
+                                <i class="fas fa-plus me-1"></i>Nueva Tarea
+                            </a>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${courses.empty}" class="text-center py-5">
+            <i class="fas fa-book fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No tienes cursos</h4>
+            <p class="text-muted">
+                <th:block th:if="${currentUser.role.name() == 'TEACHER'}">
+                    Crea tu primer curso para comenzar
+                </th:block>
+                <th:block th:if="${currentUser.role.name() == 'STUDENT'}">
+                    Únete a un curso para comenzar
+                </th:block>
+            </p>
+            <th:block th:if="${currentUser.role.name() == 'STUDENT'}">
+                <a th:href="@{/courses/join}" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt me-1"></i>Unirse a Curso
+                </a>
+            </th:block>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

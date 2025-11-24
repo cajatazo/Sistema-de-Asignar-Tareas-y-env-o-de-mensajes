@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensajes - Sistema de Tareas</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/messages/compose}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>Nuevo Mensaje
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="card-title">Filtros</h6>
+                        <div class="list-group list-group-flush">
+                            <a th:href="@{/messages}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-inbox me-2"></i>Bandeja de Entrada
+                                <span th:if="${unreadMessageCount > 0}" class="badge bg-danger float-end" th:text="${unreadMessageCount}"></span>
+                            </a>
+                            <a th:href="@{/messages/sent}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-paper-plane me-2"></i>Mensajes Enviados
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <th:block th:if="${showSentOnly == null or !showSentOnly}">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">Bandeja de Entrada</h4>
+                            <span class="badge bg-primary" th:text="${receivedMessages.size() + ' mensajes'}"></span>
+                        </div>
+                    <div class="card-body p-0">
+                        <div th:if="${receivedMessages.empty}" class="text-center text-muted py-5">
+                            <i class="fas fa-envelope fa-4x mb-3"></i>
+                            <h5>No tienes mensajes</h5>
+                            <p class="mb-0">Cuando recibas mensajes, aparecerán aquí</p>
+                            <a th:href="@{/messages/compose}" class="btn btn-primary mt-3">
+                                <i class="fas fa-plus me-1"></i>Escribir Mensaje
+                            </a>
+                        </div>
+                        
+                        <div th:each="message : ${receivedMessages}" 
+                             class="border-bottom p-3" 
+                             th:classappend="${!message.read} ? 'message-unread' : 'message-read'">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1" th:text="${message.subject}"></h6>
+                                    <p class="mb-1 text-muted" th:text="${message.content.length() > 100 ? message.content.substring(0, 100) + '...' : message.content}"></p>
+                                    <small class="text-muted">
+                                        De: <strong th:text="${message.sender.fullName}"></strong> | 
+                                        <span th:text="${#temporals.format(message.sentAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </small>
+                                </div>
+                                <div class="ms-3">
+                                    <th:block th:if="${!message.read}">
+                                        <span class="badge bg-danger me-2">Nuevo</span>
+                                    </th:block>
+                                    <a th:href="@{/messages/{id}(id=${message.id})}" class="btn btn-sm btn-outline-primary">
+                                        Ver
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </th:block>
+
+                <!-- Mensajes Enviados -->
+                <div class="card" th:classappend="${showSentOnly != null and showSentOnly} ? '' : 'mt-4'">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0" th:text="${showSentOnly != null and showSentOnly} ? 'Mensajes Enviados' : 'Mensajes Enviados'"></h4>
+                        <span class="badge bg-primary" th:text="${sentMessages.size() + ' mensajes'}"></span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div th:if="${sentMessages.empty}" class="text-center text-muted py-5">
+                            <i class="fas fa-paper-plane fa-4x mb-3"></i>
+                            <h5>No has enviado mensajes</h5>
+                            <p class="mb-0">Los mensajes que envíes aparecerán aquí</p>
+                            <a th:href="@{/messages/compose}" class="btn btn-primary mt-3">
+                                <i class="fas fa-plus me-1"></i>Escribir Mensaje
+                            </a>
+                        </div>
+                        
+                        <div th:each="message : ${sentMessages}" class="border-bottom p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1" th:text="${message.subject}"></h6>
+                                    <p class="mb-1 text-muted" th:text="${message.content.length() > 100 ? message.content.substring(0, 100) + '...' : message.content}"></p>
+                                    <small class="text-muted">
+                                        Para: <strong th:text="${message.receiver.fullName}"></strong> | 
+                                        <span th:text="${#temporals.format(message.sentAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </small>
+                                </div>
+                                <div class="ms-3">
+                                    <a th:href="@{/messages/{id}(id=${message.id})}" class="btn btn-sm btn-outline-primary">
+                                        Ver
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

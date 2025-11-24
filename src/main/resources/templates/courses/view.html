@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${course.name} + ' - Sistema de Tareas'"></title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0" th:text="${course.name}"></h3>
+                        <th:block th:if="${currentUser.role.name() == 'TEACHER'}">
+                            <a th:href="@{/tasks/create?courseId={id}(id=${course.id})}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>Nueva Tarea
+                            </a>
+                        </th:block>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text" th:text="${course.description}"></p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <h5>Información del Curso</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Código:</span>
+                                        <strong th:text="${course.code}"></strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Profesor:</span>
+                                        <strong th:text="${course.teacher.fullName}"></strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Estudiantes:</span>
+                                        <strong th:text="${course.students.size()}"></strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Fecha de Creación:</span>
+                                        <strong th:text="${#temporals.format(course.createdAt, 'dd/MM/yyyy')}"></strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5>Acciones</h5>
+                                <div class="d-grid gap-2">
+                                    <th:block th:if="${currentUser.role.name() == 'TEACHER'}">
+                                        <a th:href="@{/courses/{id}/students(id=${course.id})}" class="btn btn-outline-primary">
+                                            <i class="fas fa-users me-1"></i>Gestionar Estudiantes
+                                        </a>
+                                    </th:block>
+                                    <th:block th:if="${currentUser.role.name() == 'STUDENT'}">
+                                        <a th:href="@{/messages/compose?to={id}(id=${course.teacher.id})}" class="btn btn-outline-info">
+                                            <i class="fas fa-envelope me-1"></i>Contactar Profesor
+                                        </a>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tareas del Curso -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Tareas del Curso</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${course.tasks.empty}" class="text-center text-muted py-4">
+                            <i class="fas fa-tasks fa-3x mb-3"></i>
+                            <p>No hay tareas en este curso</p>
+                            <th:block th:if="${currentUser.role.name() == 'TEACHER'}">
+                                <a th:href="@{/tasks/create?courseId={id}(id=${course.id})}" class="btn btn-primary">
+                                    Crear Primera Tarea
+                                </a>
+                            </th:block>
+                        </div>
+                        
+                        <div th:each="task : ${course.tasks}" class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 th:text="${task.title}"></h6>
+                                    <p class="text-muted mb-1" th:text="${task.description}"></p>
+                                    <div class="d-flex gap-3 text-muted small">
+                                        <span>
+                                            <i class="fas fa-clock me-1"></i>
+                                            Vence: <span th:text="${#temporals.format(task.dueDate, 'dd/MM/yyyy HH:mm')}"></span>
+                                        </span>
+                                        <span>
+                                            <i class="fas fa-star me-1"></i>
+                                            Puntos: <span th:text="${task.points}"></span>
+                                        </span>
+                                        <span class="badge" 
+                                              th:classappend="${task.status == 'PENDING' ? 'bg-warning' : (task.status == 'IN_PROGRESS' ? 'bg-info' : (task.status == 'COMPLETED' ? 'bg-success' : 'bg-secondary'))}"
+                                              th:text="${task.status}">
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <a th:href="@{/tasks/{id}(id=${task.id})}" class="btn btn-sm btn-outline-primary">
+                                        Ver Detalles
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <!-- Estudiantes del Curso -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Estudiantes Inscritos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${course.students.empty}" class="text-center text-muted py-3">
+                            <p>No hay estudiantes inscritos</p>
+                        </div>
+                        
+                        <div th:each="student : ${course.students}" class="d-flex align-items-center mb-2">
+                            <img th:src="@{/images/avatar.png}" class="rounded-circle me-2" width="32" height="32">
+                            <div class="flex-grow-1">
+                                <div th:text="${student.fullName}"></div>
+                                <small class="text-muted" th:text="${student.email}"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
